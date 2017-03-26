@@ -9,6 +9,7 @@ var ball = {x: canvas.width / 2, y: canvas.height - 30, radius:10, color: "#0095
 var block = { columns: 10, rows: 6,  space: 8 };
 block.width = (canvas.width - (block.columns * block.space + block.space)) / (block.columns);
 block.height = (canvas.height - (block.rows * block.space + block.space)) / (block.rows * 2);
+var blocks = [];
 var racket = {width: canvas.width / 10, height: 5, x: canvas.width / 2, y: canvas.height - 15, speed: 7};
 racket.validate = function(move) {
     if (((racket.x - racket.width/2) + move < 0) || ((racket.x + racket.width/2) + move) > canvas.width) {
@@ -16,7 +17,7 @@ racket.validate = function(move) {
     } else {
         return true;
     }
-}
+};
 
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
@@ -37,16 +38,31 @@ function keyUpHandler(e) {
     }
 }
 
-function drawBlocks() {
+function createBlocks() {
     for (var i = 0; i < block.columns; i++) {
+        blocks[i] = [];
         for (var j = 0; j < block.rows; j++) {
-            ctx.fillRect(i * block.width + i * block.space + block.space, j * block.height + j * block.space, block.width, block.height);
+            blocks[i][j] = {x: i * block.width + i * block.space + block.space, y: j * block.height + j * block.space, w: block.width, h: block.height, destroyed: false };
         }
     }
 }
 
+function drawBlocks() {
+    blocks.map(function(blockColumn) {
+        blockColumn.map(drawBlock);
+    });
+}
+
+function drawBlock(b) {
+    if(!b.destroyed) {
+        b.destroyed = hitDetection(b, ball);
+        ctx.fillRect(b.x, b.y, b.w, b.h);
+    }
+}
+
 function drawRacket() {
-    if (racket.rightPressed && racket.validate(racket.speed)) {
+    if (racket.rightPressed && racket.valida
+ //   console.log(block);te(racket.speed)) {
         racket.x += racket.speed;
     } else if (racket.leftPressed && racket.validate(-racket.speed)) {
         racket.x -= racket.speed;
@@ -79,6 +95,15 @@ function drawBall() {
     }
 }
 
+function hitDetection(block, ball) {
+    if(ball.x > block.x && ball.x < block.x + block.w && ball.y > block.y && ball.y < block.y + block.h) {
+        console.log("hit");
+        return true;
+    } else {
+        return false;
+    }
+}
+
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBlocks();
@@ -86,4 +111,5 @@ function draw() {
     drawBall();
 
 }
+createBlocks();
 setInterval(draw, game.speed);
