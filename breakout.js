@@ -16,6 +16,7 @@ racket.validate = function(move) {
 
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
+document.addEventListener("mousemove", mouseMoveHandler, false);
 
 function keyDownHandler(e) {
     if (e.keyCode === 39) {
@@ -32,6 +33,13 @@ function keyUpHandler(e) {
         racket.rightPressed = false;
     } else if (e.keyCode === 37) {
         racket.leftPressed = false;
+    }
+}
+
+function mouseMoveHandler(e) {
+    var move = e.clientX - canvas.offsetLeft;
+    if (move > 0 && move < canvas.width) {
+        racket.x = move - racket.width/2;
     }
 }
 
@@ -79,6 +87,7 @@ function drawBall() {
     }
     if (ball.y >= canvas.height - ball.radius) {
         alert("GAME OVER");
+        game.paused = true;
     } else if (ball.y <= ball.radius) {
         ball.dy = ball.dy * -1;
     } else if  (ball.y < (racket.y + 1) && ball.y + ball.dy > (racket.y - 1)) {
