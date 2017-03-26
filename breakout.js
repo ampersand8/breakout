@@ -3,11 +3,13 @@
  */
 var canvas = document.getElementById('breakoutCanvas');
 var ctx = canvas.getContext('2d');
-var game = {speed: 20, paused: false};
+var game = {speed: 20, paused: false, level: 0};
+var levels = [{speed: 20},{speed:15},{speed: 10},{speed: 5}];
 var ball = {x: canvas.width / 2, y: canvas.height - 30, radius:10, color: "#0095DD", dx: 2, dy: -2};
 var block = { columns: 10, rows: 6,  space: 8 };
 block.width = (canvas.width - (block.columns * block.space + block.space)) / (block.columns);
 block.height = (canvas.height - (block.rows * block.space + block.space)) / (block.rows * 2);
+game.blocks = block.columns * block.rows;
 var blocks = [];
 var racket = {width: canvas.width / 10, height: 5, x: canvas.width / 2, y: canvas.height - 15, speed: 7};
 racket.validate = function(move) {
@@ -17,6 +19,20 @@ racket.validate = function(move) {
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 document.addEventListener("mousemove", mouseMoveHandler, false);
+
+// sets coords and direction to initial values
+function initialBall() {
+    ball.x = canvas.width / 2;
+    ball.y = canvas.height - 30;
+    ball.dx = 2;
+    ball.dy = -2;
+}
+
+// sets coords to initial values
+function initialRacket() {
+    racket.x = canvas.width / 2;
+    racket.y = canvas.height - 15;
+}
 
 function keyDownHandler(e) {
     if (e.keyCode === 39) {
@@ -122,9 +138,11 @@ function hitDetection(block, ball) {
 
     if (helpDetection(cd,cz,dc,dz) || helpDetection(ab,az,ba,bz)) {
         ball.dy = -ball.dy;
+        game.blocks -= 1;
         return true;
     } else if (helpDetection(ac,az,ca,cz) || helpDetection(bd,bz,db,dz)) {
         ball.dx = -ball.dx;
+        game.blocks -= 1;
         return true;
     }
     return false;
@@ -148,6 +166,19 @@ function helpDetection(ab,az,ba,bz) {
 }
 
 function draw() {
+    if (game.blocks === 0) {
+        game.paused = true;
+        game.level += 1;
+        game.speed = levels[game.level].speed;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        createBlocks();
+        initialBall();
+        initialRacket();
+        game.blocks = block.columns * block.rows;
+        alert("Congrats, on to level "+game.level+1);
+        clearInterval(run);
+        run = setInterval(draw, game.speed);
+    }
     if (!game.paused) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawBlocks();
@@ -156,4 +187,4 @@ function draw() {
     }
 }
 createBlocks();
-setInterval(draw, game.speed);
+var run = setInterval(draw, game.speed);
