@@ -3,7 +3,6 @@
  */
 var canvas = document.getElementById('breakoutCanvas');
 var ctx = canvas.getContext('2d');
-console.log(canvas);
 var game = {speed: 20};
 var ball = {x: canvas.width / 2, y: canvas.height - 30, radius:10, color: "#0095DD", dx: 2, dy: -2};
 var block = { columns: 10, rows: 6,  space: 8 };
@@ -12,28 +11,24 @@ block.height = (canvas.height - (block.rows * block.space + block.space)) / (blo
 var blocks = [];
 var racket = {width: canvas.width / 10, height: 5, x: canvas.width / 2, y: canvas.height - 15, speed: 7};
 racket.validate = function(move) {
-    if (((racket.x - racket.width/2) + move < 0) || ((racket.x + racket.width/2) + move) > canvas.width) {
-        return false;
-    } else {
-        return true;
-    }
+    return !(((racket.x - racket.width / 2) + move < 0) || ((racket.x + racket.width / 2) + move) > canvas.width);
 };
 
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 
 function keyDownHandler(e) {
-    if (e.keyCode == 39) {
+    if (e.keyCode === 39) {
         racket.rightPressed = true;
-    } else if (e.keyCode == 37) {
+    } else if (e.keyCode === 37) {
         racket.leftPressed = true;
     }
 }
 
 function keyUpHandler(e) {
-    if (e.keyCode == 39) {
+    if (e.keyCode === 39) {
         racket.rightPressed = false;
-    } else if (e.keyCode == 37) {
+    } else if (e.keyCode === 37) {
         racket.leftPressed = false;
     }
 }
@@ -55,14 +50,13 @@ function drawBlocks() {
 
 function drawBlock(b) {
     if(!b.destroyed) {
-        b.destroyed = hitDetection(b, ball);
+        b.destroyed = newhitDetection(b, ball);
         ctx.fillRect(b.x, b.y, b.w, b.h);
     }
 }
 
 function drawRacket() {
-    if (racket.rightPressed && racket.valida
- //   console.log(block);te(racket.speed)) {
+    if (racket.rightPressed && racket.validate(racket.speed)) {
         racket.x += racket.speed;
     } else if (racket.leftPressed && racket.validate(-racket.speed)) {
         racket.x -= racket.speed;
@@ -86,9 +80,6 @@ function drawBall() {
     } else if (ball.y <= ball.radius) {
         ball.dy = ball.dy * -1;
     } else if  (ball.y < (racket.y + 1) && ball.y + ball.dy > (racket.y - 1)) {
-        console.log("Ball:"+ball.x);
-        console.log("Racket:"+racket.x);
-        console.log(racket);
         if (ball.x > racket.x - (racket.width / 2) && ball.x < racket.x + (racket.width / 2)) {
             ball.dy = ball.dy *-1;
         }
@@ -96,12 +87,53 @@ function drawBall() {
 }
 
 function hitDetection(block, ball) {
-    if(ball.x > block.x && ball.x < block.x + block.w && ball.y > block.y && ball.y < block.y + block.h) {
-        console.log("hit");
+    // Set edge above (AB)
+    var ab = {x: block.w, y: 0};
+    var ba = {x: -block.w, y: 0};
+
+    // Set edge below (CD)
+    var cd = ab;
+    var dc = ba;
+
+    // Set edge left
+    var ac = {x: 0, y: block.h};
+    var ca = {x: 0, y: -block.h};
+
+    // Above edge right
+    var bd = ac;
+    var db = ca;
+
+    // Set edge to ball
+    var az = {x: ball.x - block.x, y: ball.y - block.y};
+    var bz = {x: ball.x - (block.x + block.w), y: ball.y - block.y};
+    var cz = {x: ball.x - block.x, y: ball.y - (block.y + block.h)};
+    var dz = {x: ball.x - (block.x + block.w), y: ball.y - (block.y + block.h)};
+
+    if (helpDetection(cd,cz,dc,dz) || helpDetection(ab,az,ba,bz)) {
+        ball.dy = -ball.dy;
         return true;
-    } else {
-        return false;
+    } else if (helpDetection(ac,az,ca,cz) || helpDetection(bd,bz,db,dz)) {
+        ball.dx = -ball.dx;
+        return true;
     }
+    return false;
+}
+
+function helpDetection(ab,az,ba,bz) {
+    var normalLength = Math.sqrt(Math.pow(ab.x,2)+Math.pow(ab.y,2));
+    var distance = Math.abs((az.x*ab.y-az.y*ab.x)/normalLength);
+
+    if (distance < 10) {
+        // Calculate angle
+        var skalarproduct1 = ab.x * az.x + ab.y * az.y;
+        if (skalarproduct1 >= 0) {
+            var skalarproduct2 = ba.x * bz.x + ba.y * bz.y;
+            if (skalarproduct2 >= 0) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 function draw() {
