@@ -3,7 +3,7 @@
  */
 var canvas = document.getElementById('breakoutCanvas');
 var ctx = canvas.getContext('2d');
-var game = {speed: 20};
+var game = {speed: 20, paused: false};
 var ball = {x: canvas.width / 2, y: canvas.height - 30, radius:10, color: "#0095DD", dx: 2, dy: -2};
 var block = { columns: 10, rows: 6,  space: 8 };
 block.width = (canvas.width - (block.columns * block.space + block.space)) / (block.columns);
@@ -22,6 +22,8 @@ function keyDownHandler(e) {
         racket.rightPressed = true;
     } else if (e.keyCode === 37) {
         racket.leftPressed = true;
+    } else if (e.keyCode === 32) {
+        game.paused = !game.paused;
     }
 }
 
@@ -50,7 +52,7 @@ function drawBlocks() {
 
 function drawBlock(b) {
     if(!b.destroyed) {
-        b.destroyed = newhitDetection(b, ball);
+        b.destroyed = hitDetection(b, ball);
         ctx.fillRect(b.x, b.y, b.w, b.h);
     }
 }
@@ -137,11 +139,12 @@ function helpDetection(ab,az,ba,bz) {
 }
 
 function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawBlocks();
-    drawRacket();
-    drawBall();
-
+    if (!game.paused) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawBlocks();
+        drawRacket();
+        drawBall();
+    }
 }
 createBlocks();
 setInterval(draw, game.speed);
