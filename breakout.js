@@ -3,15 +3,15 @@
  */
 var canvas = document.getElementById('breakoutCanvas');
 var ctx = canvas.getContext('2d');
-var game = {speed: 20, paused: false, level: 0};
-var levels = [{speed: 20},{speed:15},{speed: 10},{speed: 5}];
+var game = {speed: 1, paused: false, level: 0};
+var levels = [{speed: 1.2},{speed:1.8},{speed: 3},{speed: 5}];
 var ball = {x: canvas.width / 2, y: canvas.height - 30, radius:10, color: "#0095DD", dx: 2, dy: -2};
-var block = { columns: 10, rows: 6,  space: 8 };
+var block = { columns: 2, rows: 1,  space: 8 };
 block.width = (canvas.width - (block.columns * block.space + block.space)) / (block.columns);
 block.height = (canvas.height - (block.rows * block.space + block.space)) / (block.rows * 2);
 game.blocks = block.columns * block.rows;
 var blocks = [];
-var racket = {width: canvas.width / 10, height: 5, x: canvas.width / 2, y: canvas.height - 15, speed: 7};
+var racket = {width: canvas.width / 10, height: 5, x: canvas.width / 2, y: canvas.height - 5, speed: 7};
 racket.validate = function(move) {
     return !(((racket.x - racket.width / 2) + move < 0) || ((racket.x + racket.width / 2) + move) > canvas.width);
 };
@@ -31,7 +31,7 @@ function initialBall() {
 // sets coords to initial values
 function initialRacket() {
     racket.x = canvas.width / 2;
-    racket.y = canvas.height - 15;
+    racket.y = canvas.height - 5;
 }
 
 function keyDownHandler(e) {
@@ -98,19 +98,26 @@ function drawBall() {
     ctx.closePath();
     ball.x += ball.dx;
     ball.y += ball.dy;
+
+    var rab = {x: racket.width / 2, y: 0};
+    var rba = {x: -racket.width / 2, y:0};
+    var raz = {x: ball.x - (racket.x - racket.width/2), y: ball.y - racket.y};
+    var rbz = {x: ball.x - (racket.x + racket.width/2), y: ball.y - racket.y};
+
     if (ball.x >= canvas.width - ball.radius || ball.x <= ball.radius) {
         ball.dx = ball.dx * -1;
     }
-    if (ball.y >= canvas.height - ball.radius) {
+
+    if (ball.y <= ball.radius) {
+        ball.dy = ball.dy * -1;
+    } else if (helpDetection(rab,raz,rba,rbz)) {
+            ball.dy = ball.dy *-1;
+
+    } else if (ball.y >= canvas.height - ball.radius) {
         alert("GAME OVER");
         game.paused = true;
-    } else if (ball.y <= ball.radius) {
-        ball.dy = ball.dy * -1;
-    } else if  (ball.y < (racket.y + 1) && ball.y + ball.dy > (racket.y - 1)) {
-        if (ball.x > racket.x - (racket.width / 2) && ball.x < racket.x + (racket.width / 2)) {
-            ball.dy = ball.dy *-1;
-        }
     }
+
 }
 
 function hitDetection(block, ball) {
@@ -152,7 +159,7 @@ function helpDetection(ab,az,ba,bz) {
     var normalLength = Math.sqrt(Math.pow(ab.x,2)+Math.pow(ab.y,2));
     var distance = Math.abs((az.x*ab.y-az.y*ab.x)/normalLength);
 
-    if (distance < 10) {
+    if (distance < ball.radius) {
         // Calculate angle
         var skalarproduct1 = ab.x * az.x + ab.y * az.y;
         if (skalarproduct1 >= 0) {
@@ -174,10 +181,12 @@ function draw() {
         createBlocks();
         initialBall();
         initialRacket();
+        ball.dx = ball.dx * game.speed;
+        ball.dy = ball.dy * game.speed;
         game.blocks = block.columns * block.rows;
-        alert("Congrats, on to level "+game.level+1);
-        clearInterval(run);
-        run = setInterval(draw, game.speed);
+        alert("Congrats, on to level " + game.level + 1);
+        //clearInterval(run);
+        //run = setInterval(draw, game.speed);
     }
     if (!game.paused) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -185,6 +194,8 @@ function draw() {
         drawRacket();
         drawBall();
     }
+    requestAnimationFrame(draw);
 }
 createBlocks();
-var run = setInterval(draw, game.speed);
+//var run = setInterval(draw, game.speed);
+requestAnimationFrame(draw);
