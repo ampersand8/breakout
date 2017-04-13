@@ -1,6 +1,8 @@
 /**
  * Created by ampersand8 on 25.03.17.
  */
+var fps = 0;
+var lastRun;
 var canvas = document.getElementById('breakoutCanvas');
 var ctx = canvas.getContext('2d');
 var game = {speed: 1, paused: false, level: 0};
@@ -183,6 +185,12 @@ function helpDetection(ab,az,ba,bz) {
     return false;
 }
 
+function showFPS() {
+    ctx.fillStyle = "Black";
+    ctx.font      = "normal 16pt Arial";
+    ctx.fillText(fps + " fps", 10, canvas.height - 20);
+}
+
 function draw() {
     if (game.blocks === 0) {
         game.paused = true;
@@ -200,11 +208,16 @@ function draw() {
         //clearInterval(run);
         //run = setInterval(draw, game.speed);
     }
+
     if (!game.paused) {
+        var delta = (new Date().getTime() - lastRun)/1000;
+        lastRun = new Date().getTime();
+        fps = (1/delta).toFixed(1);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawBlocks();
         drawRacket();
         drawBall();
+        showFPS();
     }
     requestAnimationFrame(draw);
 }
