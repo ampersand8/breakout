@@ -3,10 +3,10 @@
  */
 var canvas = document.getElementById('breakoutCanvas');
 var ctx = canvas.getContext('2d');
-var game = {speed: 1, paused: false, level: 0};
-var levels = [{speed: 1.2},{speed:1.4},{speed: 1.7},{speed: 2},{speed: 2.4}, {speed: 2.8}, {speed: 3}];
+var game = {speed: 200, paused: false, level: 0};
+var levels = [{speed: 800},{speed: 600},{speed: 400},{speed: 350},{speed: 300}, {speed: 250}, {speed: 200}];
 var ball = {x: canvas.width / 2, y: canvas.height - 30, radius:10, color: "#0095DD", dx: 2, dy: -2};
-var block = { columns: 10, rows: 6,  space: 8 };
+var block = { columns: 1, rows: 3,  space: 8 };
 block.width = (canvas.width - (block.columns * block.space + block.space)) / (block.columns);
 block.height = (canvas.height - (block.rows * block.space + block.space)) / (block.rows * 2);
 game.blocks = block.columns * block.rows;
@@ -185,8 +185,10 @@ function helpDetection(ab,az,ba,bz) {
 
 function draw() {
     if (game.blocks === 0) {
+        console.log("no blocks left");
         game.paused = true;
         game.level += 1;
+        console.log(game.speed);
         game.speed = levels[game.level].speed;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         createBlocks();
@@ -194,13 +196,16 @@ function draw() {
         initialRacket();
         ball.dx = ball.dx * game.speed;
         ball.dy = ball.dy * game.speed;
-        racket.speed = racket.speed * (1 + game.speed/3);
+        //racket.speed = racket.speed * (1 + game.speed/3);
         game.blocks = block.columns * block.rows;
         alert("Congrats, on to level " + game.level + 1);
-        //clearInterval(run);
-        //run = setInterval(draw, game.speed);
+        console.log(game.level);
+        console.log(game.speed);
+        clearInterval(run);
+        run = setInterval(draw, game.speed);
     }
     if (!game.paused) {
+        console.log(ball.dx);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawBlocks();
         drawRacket();
@@ -208,7 +213,8 @@ function draw() {
     }
     requestAnimationFrame(draw);
 }
-console.log(canvas.offsetLeft);
+//console.log(canvas.offsetLeft);
 createBlocks();
-//var run = setInterval(draw, game.speed);
-requestAnimationFrame(draw);
+console.log("Outside: " + game.speed);
+var run = setInterval(draw, game.speed);
+//requestAnimationFrame(draw);
