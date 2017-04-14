@@ -5,10 +5,10 @@ var fps = 0;
 var lastRun;
 var canvas = document.getElementById('breakoutCanvas');
 var ctx = canvas.getContext('2d');
-var game = {speed: 1, paused: false, level: 0};
-var levels = [{speed: 1.2},{speed:1.4},{speed: 1.7},{speed: 2},{speed: 2.4}, {speed: 2.8}, {speed: 3}];
+var game = {speed: 2, paused: false, level: 0};
+var levels = [{speed: 2},{speed: 3},{speed:  4},{speed: 5},{speed: 6}, {speed: 7}, {speed: 8}];
 var ball = {x: canvas.width / 2, y: canvas.height - 30, radius:10, color: "#0095DD", dx: 2, dy: -2};
-var block = { columns: 10, rows: 6,  space: 8 };
+var block = { columns: 2, rows: 1,  space: 8 };
 block.width = (canvas.width - (block.columns * block.space + block.space)) / (block.columns);
 block.height = (canvas.height - (block.rows * block.space + block.space)) / (block.rows * 2);
 game.blocks = block.columns * block.rows;
@@ -28,8 +28,8 @@ document.addEventListener("touchmove", touchMoveHandler, false);
 function initialBall() {
     ball.x = canvas.width / 2;
     ball.y = canvas.height - 30;
-    ball.dx = 2;
-    ball.dy = -2;
+    ball.dx = game.speed;
+    ball.dy = -game.speed;
 }
 
 // sets coords to initial values
@@ -58,7 +58,7 @@ function keyUpHandler(e) {
 
 function mouseMoveHandler(e) {
     var move = e.clientX - canvas.offsetLeft;
-    if (move > 0 && move < canvas.width) {
+    if ((move-racket.width)+3 > 0 && move < canvas.width+3) {
         racket.x = move - racket.width / 2;
     }
 }
@@ -203,9 +203,8 @@ function draw() {
         createBlocks();
         initialBall();
         initialRacket();
-        ball.dx = ball.dx * game.speed;
-        ball.dy = ball.dy * game.speed;
-        racket.speed = racket.speed * (1 + game.speed/3);
+        ball.dx = game.speed;
+        ball.dy = game.speed;
         game.blocks = block.columns * block.rows;
         alert("Congrats, on to level " + game.level + 1);
         //clearInterval(run);
