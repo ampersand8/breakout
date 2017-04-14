@@ -82,15 +82,19 @@ function createBlocks() {
 }
 
 function drawBlocks() {
+    ctx.beginPath();
     blocks.map(function(blockColumn) {
         blockColumn.map(drawBlock);
     });
+    ctx.stroke();
 }
 
 function drawBlock(b) {
     if(!b.destroyed) {
         b.destroyed = hitDetection(b, ball);
-        ctx.fillRect(b.x, b.y, b.w, b.h);
+        ctx.moveTo(b.x,b.y+b.h/2);
+        ctx.lineTo(b.x+b.w,b.y+b.h/2);
+        ctx.lineWidth = b.h;
     }
 }
 
@@ -105,10 +109,10 @@ function drawRacket() {
 
 function drawBall() {
     ctx.beginPath();
-    ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-    ctx.fillStyle = ball.color;
-    ctx.fill();
-    ctx.closePath();
+    ctx.arc(ball.x, ball.y, ball.radius/2, 0, Math.PI * 2);
+    ctx.strokeStyle = ball.color;
+    ctx.lineWidth = ball.radius;
+    ctx.stroke();
     ball.x += ball.dx;
     ball.y += ball.dy;
 
@@ -130,7 +134,6 @@ function drawBall() {
         alert("GAME OVER");
         game.paused = true;
     }
-
 }
 
 function hitDetection(block, ball) {
@@ -221,7 +224,5 @@ function draw() {
     }
     requestAnimationFrame(draw);
 }
-console.log(canvas.offsetLeft);
 createBlocks();
-//var run = setInterval(draw, game.speed);
 requestAnimationFrame(draw);
