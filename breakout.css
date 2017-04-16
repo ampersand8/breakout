@@ -2,3 +2,7 @@ div#content {
     width: 80%;
     margin: auto;
 }
+
+body {
+    margin-top: 0;
+}

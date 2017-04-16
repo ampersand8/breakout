@@ -1,11 +1,13 @@
 /**
  * Created by ampersand8 on 25.03.17.
  */
+
 var fps = 0;
 var lastRun;
 var canvas = document.getElementById('breakoutCanvas');
+resizeCanvas();
 var ctx = canvas.getContext('2d');
-var game = {speed: 2, paused: false, level: 0};
+var game = {speed: 2, paused: false, level: 0, lives: 3};
 var levels = [{speed: 2},{speed: 3},{speed:  4},{speed: 5},{speed: 6}, {speed: 7}, {speed: 8}];
 var ball = {x: canvas.width / 2, y: canvas.height - 30, radius:10, color: "#0095DD", dx: 2, dy: -2};
 var block = { columns: 2, rows: 1,  space: 8 };
@@ -131,8 +133,15 @@ function drawBall() {
             ball.dy = ball.dy *-1;
 
     } else if (ball.y >= canvas.height - ball.radius) {
-        alert("GAME OVER");
+        game.lives = game.lives - 1;
         game.paused = true;
+        if (game.lives < 1) {
+            alert("GAME OVER");
+        } else {
+            initialBall();
+            initialRacket();
+            updateInfo();
+        }
     }
 }
 
@@ -210,6 +219,12 @@ function showFPS() {
     ctx.fillText(fps + " fps", 10, canvas.height - 20);
 }
 
+function updateInfo() {
+    //console.log(document.getElementById('lives'));
+    document.getElementById('lives').innerHTML = game.lives;
+    document.getElementById('level').innerHTML = game.level;
+}
+
 function draw() {
     if (game.blocks === 0) {
         game.paused = true;
@@ -219,6 +234,7 @@ function draw() {
         createBlocks();
         initialBall();
         initialRacket();
+        updateInfo();
         ball.dx = game.speed;
         ball.dy = game.speed;
         game.blocks = block.columns * block.rows;
@@ -230,7 +246,7 @@ function draw() {
     if (!game.paused) {
         var delta = (new Date().getTime() - lastRun)/1000;
         lastRun = new Date().getTime();
-        fps = (1/delta).toFixed(1);
+        fps = (1/delta).toFixed();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawBlocks();
         drawRacket();
@@ -241,8 +257,9 @@ function draw() {
 }
 console.log(canvas.width);
 console.log(canvas.height);
-resizeCanvas();
+
 console.log(canvas.width);
 console.log(canvas.height);
+updateInfo();
 createBlocks();
 requestAnimationFrame(draw);
