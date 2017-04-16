@@ -188,6 +188,22 @@ function helpDetection(ab,az,ba,bz) {
     return false;
 }
 
+function resizeCanvas() {
+    console.log("resizing Canvas");
+    var fullWidth = window.innerWidth && document.documentElement.clientWidth ?
+        Math.min(window.innerWidth, document.documentElement.clientWidth) :
+        window.innerWidth ||
+        document.documentElement.clientWidth ||
+        document.getElementsByTagName('body')[0].clientWidth;
+    var fullHeight = window.innerHeight && document.documentElement.clientHeight ?
+        Math.min(window.innerHeight, document.documentElement.clientHeight) :
+        window.innerHeight ||
+        document.documentElement.clientHeight ||
+        document.getElementsByTagName('body')[0].clientHeight;
+    canvas.width = Math.round(fullWidth * 0.8);
+    canvas.height = Math.round(fullHeight * 0.5);
+}
+
 function showFPS() {
     ctx.fillStyle = "Black";
     ctx.font      = "normal 16pt Arial";
@@ -223,5 +239,10 @@ function draw() {
     }
     requestAnimationFrame(draw);
 }
+console.log(canvas.width);
+console.log(canvas.height);
+resizeCanvas();
+console.log(canvas.width);
+console.log(canvas.height);
 createBlocks();
 requestAnimationFrame(draw);

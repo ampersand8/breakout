@@ -1,5 +1,4 @@
-canvas#breakoutCanvas {
-    width: 90em;
-    height: 45em;
+div#content {
+    width: 80%;
     margin: auto;
 }
