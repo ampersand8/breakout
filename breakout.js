@@ -19,6 +19,7 @@ var racket = {width: canvas.width / 10, height: 5, x: canvas.width / 2, y: canva
 racket.validate = function(move) {
     return !(((racket.x - racket.width / 2) + move < 0) || ((racket.x + racket.width / 2) + move) > canvas.width);
 };
+var breakingNotification;
 
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
@@ -47,6 +48,9 @@ function keyDownHandler(e) {
         racket.leftPressed = true;
     } else if (e.keyCode === 32) {
         game.paused = !game.paused;
+        if (breakingNotification) {
+            hideBreakingNotification();
+        }
     } else if (e.keyCode === 38) {
         racket.speed = racket.speed + 1;
         updateInfo();
@@ -142,13 +146,27 @@ function drawBall() {
         game.lives = game.lives - 1;
         game.paused = true;
         if (game.lives < 1) {
-            alert("GAME OVER");
+
+            //alert("GAME OVER");
         } else {
+            showBreakingNotification('FAIL, Press Space to continue');
             initialBall();
             initialRacket();
             updateInfo();
         }
     }
+}
+
+function showBreakingNotification(text) {
+    game.paused = true;
+    breakingNotification = true;
+    document.getElementById('breakingNotificationBG').className = 'show';
+    document.getElementById('breakingNotificationText').innerHTML = text;
+}
+
+function hideBreakingNotification() {
+    breakingNotification = false;
+    document.getElementById('breakingNotificationBG').className = '';
 }
 
 function hitDetection(block, ball) {
@@ -215,8 +233,12 @@ function resizeCanvas() {
         window.innerHeight ||
         document.documentElement.clientHeight ||
         document.getElementsByTagName('body')[0].clientHeight;
-    canvas.width = Math.round(fullWidth * 0.8);
-    canvas.height = Math.round(fullHeight * 0.5);
+    var gameWidth = Math.round(fullWidth * 0.8);
+    var gameHeight = Math.round(fullHeight * 0.5);
+    canvas.width = gameWidth;
+    canvas.height = gameHeight;
+    document.getElementById('game').style.width = gameWidth+'px';
+    document.getElementById('game').style.height = gameHeight+'px';
 }
 
 function showFPS() {
@@ -246,8 +268,6 @@ function draw() {
         ball.dy = game.speed;
         game.blocks = block.columns * block.rows;
         alert("Congrats, on to level " + game.level + 1);
-        //clearInterval(run);
-        //run = setInterval(draw, game.speed);
     }
 
     if (!game.paused) {
