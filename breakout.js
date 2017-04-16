@@ -47,6 +47,12 @@ function keyDownHandler(e) {
         racket.leftPressed = true;
     } else if (e.keyCode === 32) {
         game.paused = !game.paused;
+    } else if (e.keyCode === 38) {
+        racket.speed = racket.speed + 1;
+        updateInfo();
+    } else if (e.keyCode === 40) {
+        racket.speed = racket.speed - 1;
+        updateInfo();
     }
 }
 
@@ -223,6 +229,7 @@ function updateInfo() {
     //console.log(document.getElementById('lives'));
     document.getElementById('lives').innerHTML = game.lives;
     document.getElementById('level').innerHTML = game.level;
+    document.getElementById('racketspeed').innerHTML = racket.speed;
 }
 
 function draw() {
