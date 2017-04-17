@@ -281,7 +281,7 @@ function initializeGame(level) {
     initialRacket();
     updateInfo();
     ball.dx = game.speed;
-    ball.dy = game.speed;
+    ball.dy = -game.speed;
     game.blocks = block.columns * block.rows;
 }
 
