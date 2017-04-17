@@ -249,7 +249,7 @@ function resizeCanvas() {
         document.documentElement.clientHeight ||
         document.getElementsByTagName('body')[0].clientHeight;
     var gameWidth = Math.round(fullWidth * 0.8);
-    var gameHeight = Math.round(fullHeight * 0.5);
+    var gameHeight = Math.round(fullHeight * 0.8);
     canvas.width = gameWidth;
     canvas.height = gameHeight;
     document.getElementById('game').style.width = gameWidth+'px';
