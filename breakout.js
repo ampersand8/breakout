@@ -49,7 +49,7 @@ function keyDownHandler(e) {
     } else if (e.keyCode === 32) {
         game.paused = !game.paused;
         if (game.lives < 1) {
-            initializeGame();
+            initializeGame(0);
         }
         if (breakingNotification) {
             hideBreakingNotification();
@@ -149,9 +149,7 @@ function drawBall() {
         game.lives = game.lives - 1;
         game.paused = true;
         if (game.lives < 1) {
-
             showBreakingNotification('GAME OVER<br>Press Space to start new game','FAIL');
-            //alert("GAME OVER");
         } else {
             showBreakingNotification('FAIL<br>'+game.lives+' Lives left<br>Press Space to continue','FAIL');
             initialBall();
@@ -271,9 +269,11 @@ function updateInfo() {
     document.getElementById('racketspeed').innerHTML = racket.speed;
 }
 
-function initializeGame() {
-    game.lives = 3;
-    game.level = 0;
+function initializeGame(level) {
+    if (game.lives === 0 && level === 0) {
+        game.lives = 3;
+    }
+    game.level = level;
     game.speed = levels[game.level].speed;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     createBlocks();
@@ -288,17 +288,8 @@ function initializeGame() {
 function draw() {
     if (game.blocks === 0) {
         game.paused = true;
-        game.level += 1;
-        game.speed = levels[game.level].speed;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        createBlocks();
-        initialBall();
-        initialRacket();
-        updateInfo();
-        ball.dx = game.speed;
-        ball.dy = game.speed;
-        game.blocks = block.columns * block.rows;
-        alert("Congrats, on to level " + game.level + 1);
+        initializeGame(game.level+1);
+        showBreakingNotification('CONGRATS<br>You reached level '+game.level,'SUCCESS');
     }
 
     if (!game.paused) {
@@ -313,11 +304,6 @@ function draw() {
     }
     requestAnimationFrame(draw);
 }
-console.log(canvas.width);
-console.log(canvas.height);
-
-console.log(canvas.width);
-console.log(canvas.height);
 updateInfo();
 createBlocks();
 requestAnimationFrame(draw);

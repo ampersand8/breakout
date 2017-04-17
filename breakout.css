@@ -41,12 +41,21 @@ div#breakingNotificationBG {
     left: 50%;
     transform: translate(-50%, -50%);
     -ms-transform: translate(-50%, -50%);
-}
-
-#breakingNotificationText.fail {
-    color: red;
     text-shadow:     -1px -1px 2px #FFF,
     1px -1px 2px #FFF,
     -1px 1px 2px #FFF,
     1px 1px 2px #FFF;
+}
+
+#breakingNotificationText.fail {
+    color: red;
+}
+
+#breakingNotificationText.success {
+    color: #02b200;
+}
+
+label.info {
+    font-size: 1.5em;
+    font-family: Arial, Verdana, sans-serif;
 }
