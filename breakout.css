@@ -32,11 +32,21 @@ div#breakingNotificationBG {
 #breakingNotificationText {
     white-space: nowrap;
     color: white;
-    font-size: 20px;
+    font-weight: bold;
+    font-size: 30px;
+    font-family: Arial, Verdana, sans-serif;
     position: absolute;
     overflow: hidden;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     -ms-transform: translate(-50%, -50%);
+}
+
+#breakingNotificationText.fail {
+    color: red;
+    text-shadow:     -1px -1px 2px #FFF,
+    1px -1px 2px #FFF,
+    -1px 1px 2px #FFF,
+    1px 1px 2px #FFF;
 }

@@ -48,6 +48,9 @@ function keyDownHandler(e) {
         racket.leftPressed = true;
     } else if (e.keyCode === 32) {
         game.paused = !game.paused;
+        if (game.lives < 1) {
+            initializeGame();
+        }
         if (breakingNotification) {
             hideBreakingNotification();
         }
@@ -147,9 +150,10 @@ function drawBall() {
         game.paused = true;
         if (game.lives < 1) {
 
+            showBreakingNotification('GAME OVER<br>Press Space to start new game','FAIL');
             //alert("GAME OVER");
         } else {
-            showBreakingNotification('FAIL, Press Space to continue');
+            showBreakingNotification('FAIL<br>'+game.lives+' Lives left<br>Press Space to continue','FAIL');
             initialBall();
             initialRacket();
             updateInfo();
@@ -157,7 +161,20 @@ function drawBall() {
     }
 }
 
-function showBreakingNotification(text) {
+// text: Text to show in the notification
+// type: Type of the notification: FAIL, INFO, SUCCESS
+function showBreakingNotification(text,type) {
+    switch (type) {
+        case 'FAIL':
+            document.getElementById('breakingNotificationText').className = 'fail';
+            break;
+        case 'SUCCESS':
+            document.getElementById('breakingNotificationText').className = 'success';
+            break;
+        default:
+            document.getElementById('breakingNotificationText').className = 'info';
+            break;
+    }
     game.paused = true;
     breakingNotification = true;
     document.getElementById('breakingNotificationBG').className = 'show';
@@ -243,8 +260,8 @@ function resizeCanvas() {
 
 function showFPS() {
     ctx.fillStyle = "Black";
-    ctx.font      = "normal 16pt Arial";
-    ctx.fillText(fps + " fps", 10, canvas.height - 20);
+    ctx.font      = "normal 14pt Arial";
+    ctx.fillText(fps + " fps", 5, canvas.height - 10);
 }
 
 function updateInfo() {
@@ -252,6 +269,20 @@ function updateInfo() {
     document.getElementById('lives').innerHTML = game.lives;
     document.getElementById('level').innerHTML = game.level;
     document.getElementById('racketspeed').innerHTML = racket.speed;
+}
+
+function initializeGame() {
+    game.lives = 3;
+    game.level = 0;
+    game.speed = levels[game.level].speed;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    createBlocks();
+    initialBall();
+    initialRacket();
+    updateInfo();
+    ball.dx = game.speed;
+    ball.dy = game.speed;
+    game.blocks = block.columns * block.rows;
 }
 
 function draw() {
