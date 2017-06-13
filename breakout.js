@@ -5,6 +5,7 @@
 var fps = 0;
 var lastRun;
 var canvas = document.getElementById('breakoutCanvas');
+var Colors = Object.freeze({"fallableBlock":'#f33', "fallingBlock": '#222', "defaultBlock": '#0095dd'});
 resizeCanvas();
 var ctx = canvas.getContext('2d');
 var game = {speed: 2, paused: false, level: 0, lives: 3};
@@ -91,26 +92,38 @@ function createBlocks() {
     for (var i = 0; i < block.columns; i++) {
         blocks[i] = [];
         for (var j = 0; j < block.rows; j++) {
-            blocks[i][j] = {x: i * block.width + i * block.space + block.space, y: j * block.height + j * block.space, w: block.width, h: block.height, destroyed: false };
+            blocks[i][j] = {x: i * block.width + i * block.space + block.space, y: j * block.height + j * block.space, w: block.width, h: block.height, destroyed: false, fallable: true };
         }
     }
 }
 
 function drawBlocks() {
-    ctx.beginPath();
     blocks.map(function(blockColumn) {
         blockColumn.map(drawBlock);
     });
-    ctx.stroke();
 }
 
 function drawBlock(b) {
+    ctx.beginPath();
     if(!b.destroyed) {
+        if (b.fallable) {
+            ctx.strokeStyle = Colors.fallableBlock;
+        } else {
+            ctx.strokeStyle = Colors.defaultBlock;
+        }
         b.destroyed = hitDetection(b, ball);
         ctx.moveTo(b.x,b.y+b.h/2);
         ctx.lineTo(b.x+b.w,b.y+b.h/2);
         ctx.lineWidth = b.h;
+        ctx.stroke();
+    } else if (b.destroyed && b.fallable) {
+        b.y = b.y + 2;
+        ctx.strokeStyle = Colors.fallingBlock;
+        ctx.moveTo(b.x,b.y+b.h/2);
+        ctx.lineTo(b.x+b.w,b.y+b.h/2);
+        ctx.lineWidth = b.h;
     }
+    ctx.stroke();
 }
 
 function drawRacket() {
