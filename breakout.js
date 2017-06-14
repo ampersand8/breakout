@@ -11,7 +11,7 @@ var ctx = canvas.getContext('2d');
 var game = {speed: 2, paused: false, level: 0, lives: 3};
 var levels = [{speed: 2},{speed: 3},{speed:  4},{speed: 5},{speed: 6}, {speed: 7}, {speed: 8}];
 var ball = {x: canvas.width / 2, y: canvas.height - 30, radius:10, color: "#0095DD", dx: 2, dy: -2};
-var block = { columns: 2, rows: 1,  space: 8 };
+var block = { columns: 4, rows: 1,  space: 8 };
 block.width = (canvas.width - (block.columns * block.space + block.space)) / (block.columns);
 block.height = (canvas.height - (block.rows * block.space + block.space)) / (block.rows * 2);
 game.blocks = block.columns * block.rows;
@@ -123,7 +123,34 @@ function drawBlock(b) {
         ctx.lineTo(b.x+b.w,b.y+b.h/2);
         ctx.lineWidth = b.h;
     }
+     //if (b.y >= canvas.height) {
+    if (hitDetectionBlockRacket(b,racket)) {
+        game.lives = game.lives - 1;
+        game.paused = true;
+        showBreakingNotification('FAIL<br>'+game.lives+' Lives left<br>Press Space to continue','FAIL');
+        initialBall();
+        initialRacket();
+        updateInfo();
+    }
     ctx.stroke();
+}
+
+function hitDetectionBlockRacket(b, r) {
+    leftRacket = r.x - (r.width/2);
+    rightRacket = r.x + (r.width/2);
+    topRacket = r.y;
+    bottomRacket = r.y + r.height;
+
+    leftBlock = b.x;
+    rightBlock = b.x + b.w;
+    topBlock = b.y;
+    bottomBlock = b.y + (b.h);
+
+    maxLeft = Math.max(leftRacket,leftBlock);
+    minRight = Math.min(rightRacket,rightBlock);
+    minBot = Math.min(bottomRacket,bottomBlock);
+    maxTop = Math.max(topRacket,topBlock);
+    return (minBot >= maxTop) && (minRight > maxLeft)
 }
 
 function drawRacket() {
