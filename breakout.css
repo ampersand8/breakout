@@ -72,7 +72,19 @@ div#helpInfo {
     position:   fixed;
 }
 
+div#helpTextWrapper {
+    display:    inline;
+    opacity:    1;
+    width:      100%;
+    height:     100%;
+    z-index:    70;
+    top:        0;
+    left:       0;
+    position:   fixed;
+}
+
 div#helpText {
+    display: none;
     background: #FFF;
     opacity: 1;
     position: relative;

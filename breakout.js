@@ -318,8 +318,10 @@ function updateInfo() {
 function showHelp() {
     if (game.paused) {
         document.getElementById('helpInfo').style.display = 'inline';
+        document.getElementById('helpText').style.display = 'block';
     } else {
         document.getElementById('helpInfo').style.display = 'none';
+        document.getElementById('helpText').style.display = 'none';
     }
 }
 
