@@ -1,5 +1,5 @@
 /**
- * Created by ampersand8 on 25.03.17.
+ * Created by simon on 25.03.17.
  */
 
 var fps = 0;
@@ -11,7 +11,7 @@ var ctx = canvas.getContext('2d');
 var game = {speed: 2, paused: false, level: 0, lives: 3};
 var levels = [{speed: 2},{speed: 3},{speed:  4},{speed: 5},{speed: 6}, {speed: 7}, {speed: 8}];
 var ball = {x: canvas.width / 2, y: canvas.height - 30, radius:10, color: "#0095DD", dx: 2, dy: -2};
-var block = { columns: 4, rows: 1,  space: 8 };
+var block = { columns: 6, rows: 5,  space: 8 };
 block.width = (canvas.width - (block.columns * block.space + block.space)) / (block.columns);
 block.height = (canvas.height - (block.rows * block.space + block.space)) / (block.rows * 2);
 game.blocks = block.columns * block.rows;
@@ -26,7 +26,6 @@ document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 document.addEventListener("mousemove", mouseMoveHandler, false);
 document.addEventListener("touchmove", touchMoveHandler, false);
-
 
 // sets coords and direction to initial values
 function initialBall() {
@@ -92,7 +91,11 @@ function createBlocks() {
     for (var i = 0; i < block.columns; i++) {
         blocks[i] = [];
         for (var j = 0; j < block.rows; j++) {
-            blocks[i][j] = {x: i * block.width + i * block.space + block.space, y: j * block.height + j * block.space, w: block.width, h: block.height, destroyed: false, fallable: true };
+            fallable = false;
+            if (Math.random() >= 0.7) {
+                fallable = true;
+            }
+            blocks[i][j] = {x: i * block.width + i * block.space + block.space, y: j * block.height + j * block.space, w: block.width, h: block.height, destroyed: false, fallable: fallable };
         }
     }
 }
