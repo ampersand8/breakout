@@ -60,6 +60,9 @@ function keyDownHandler(e) {
     } else if (e.keyCode === 40) {
         racket.speed = racket.speed - 1;
         updateInfo();
+    } else if (e.keyCode === 72) {
+        game.paused = !game.paused;
+        showHelp();
     }
 }
 
@@ -310,6 +313,14 @@ function updateInfo() {
     document.getElementById('lives').innerHTML = game.lives;
     document.getElementById('level').innerHTML = game.level;
     document.getElementById('racketspeed').innerHTML = racket.speed;
+}
+
+function showHelp() {
+    if (game.paused) {
+        document.getElementById('helpInfo').style.display = 'inline';
+    } else {
+        document.getElementById('helpInfo').style.display = 'none';
+    }
 }
 
 function initializeGame(level) {
