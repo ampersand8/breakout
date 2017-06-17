@@ -48,6 +48,9 @@ function keyDownHandler(e) {
         racket.leftPressed = true;
     } else if (e.keyCode === 32) {
         game.paused = !game.paused;
+        if (!game.paused) {
+            showHelp();
+        }
         if (game.lives < 1) {
             initializeGame(0);
         }
@@ -315,6 +318,7 @@ function updateInfo() {
     document.getElementById('racketspeed').innerHTML = racket.speed;
 }
 
+/* only shows the help if the game has been paused */
 function showHelp() {
     if (game.paused) {
         document.getElementById('helpInfo').style.display = 'inline';
@@ -326,6 +330,10 @@ function showHelp() {
 }
 
 function initializeGame(level) {
+    game.paused = true;
+    if (level === 0) {
+        showHelp();
+    }
     if (game.lives === 0 && level === 0) {
         game.lives = 3;
     }
@@ -360,6 +368,8 @@ function draw() {
     }
     requestAnimationFrame(draw);
 }
+/*
 updateInfo();
-createBlocks();
+createBlocks();*/
+initializeGame(0);
 requestAnimationFrame(draw);
