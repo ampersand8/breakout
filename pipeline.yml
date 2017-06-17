@@ -1,0 +1,27 @@
+resources:
+- name: breakout-src
+  type: git
+  source:
+    uri: https://github.com/ampersand8/breakout.git
+
+- name: deploy-to-cf
+  type: cf
+  source:
+    api: {{cf-api}}
+    username: {{cf-username}}
+    password: {{cf-password}}
+    organization: {{cf-organization}}
+    space: {{cf-space}}
+    skip_cert_check: true
+
+jobs:
+- name: deploy-breakout
+  public: true
+  serial: true
+  plan:
+  - get: breakout-src
+    trigger: true
+  - put: deploy-to-cf
+    params:
+      manifest: breakout-src/manifest.yml
+      path: breakout-src

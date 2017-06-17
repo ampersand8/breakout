@@ -1,0 +1,6 @@
+---
+applications:
+- name: breakout
+  memory: 128M
+  host: breakout
+  buildpack: staticfile_buildpack
