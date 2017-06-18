@@ -5,7 +5,6 @@
 var fps = 0;
 var lastRun;
 var canvas = document.getElementById('breakoutCanvas');
-var Colors = Object.freeze({"fallableBlock":'#f33', "fallingBlock": '#222', "defaultBlock": '#0095dd'});
 resizeCanvas();
 var ctx = canvas.getContext('2d');
 var game = {speed: 2, paused: false, level: 0, lives: 3};
@@ -14,7 +13,6 @@ var ball = {x: canvas.width / 2, y: canvas.height - 30, radius:10, color: "#0095
 var block = { columns: 6, rows: 5,  space: 8 };
 block.width = (canvas.width - (block.columns * block.space + block.space)) / (block.columns);
 block.height = (canvas.height - (block.rows * block.space + block.space)) / (block.rows * 2);
-game.blocks = block.columns * block.rows;
 var blocks = [];
 var racket = {width: canvas.width / 10, height: 5, x: canvas.width / 2, y: canvas.height - 5, speed: 7};
 racket.validate = function(move) {
@@ -33,6 +31,59 @@ function initialBall() {
     ball.y = canvas.height - 30;
     ball.dx = game.speed;
     ball.dy = -game.speed;
+}
+
+function Block(x, y, destroyed = false, fallable = false, w = block.width, h = block.height) {
+    this.id = Math.random().toString(16).slice(2);
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.destroyed = destroyed;
+    this.fallable = fallable;
+    this.color = (function() {
+        if (this.fallable) {
+            return '#f33';
+        } else {
+            return '#0095dd';
+        }
+    })();
+    this.destroy = function() {
+        if (this.fallable) {
+            this.color = '#222';
+        }
+        this.destroyed = true;
+        var index = blocks.map(x => x.id).indexOf(this.id);
+        if (index > -1) {
+            blocks.splice(index,1);
+        }
+    };
+    this.draw = function() {
+        ctx.beginPath();
+        if (this.destroyed && !this.fallable) {
+
+        } else {
+            if (hitDetection(this, ball)) {
+                this.destroy();
+            }
+            if (this.destroyed && this.fallable) {
+                this.y = this.y + 2;
+            }
+            ctx.strokeStyle = this.color;
+            ctx.moveTo(this.x, this.y + this.h / 2);
+            ctx.lineTo(this.x + this.w, this.y + this.h / 2);
+            ctx.lineWidth = this.h;
+        }
+        if (hitDetectionBlockRacket(this,racket)) {
+            game.lives = game.lives - 1;
+            game.paused = true;
+            showBreakingNotification('FAIL<br>'+game.lives+' Lives left<br>Press Space to continue','FAIL');
+            initialBall();
+            initialRacket();
+            updateInfo();
+        }
+        ctx.stroke();
+    }
 }
 
 // sets coords to initial values
@@ -95,53 +146,24 @@ function touchMoveHandler(e) {
 
 function createBlocks() {
     for (var i = 0; i < block.columns; i++) {
-        blocks[i] = [];
         for (var j = 0; j < block.rows; j++) {
             fallable = false;
             if (Math.random() >= 0.7) {
                 fallable = true;
             }
-            blocks[i][j] = {x: i * block.width + i * block.space + block.space, y: j * block.height + j * block.space, w: block.width, h: block.height, destroyed: false, fallable: fallable };
+            blocks.push(new Block( i * block.width + i * block.space + block.space,j * block.height + j * block.space,false,fallable));
         }
     }
+}
+
+function countBlocks() {
+    return blocks.length;
 }
 
 function drawBlocks() {
-    blocks.map(function(blockColumn) {
-        blockColumn.map(drawBlock);
+    blocks.map(function(b) {
+        b.draw();
     });
-}
-
-function drawBlock(b) {
-    ctx.beginPath();
-    if(!b.destroyed) {
-        if (b.fallable) {
-            ctx.strokeStyle = Colors.fallableBlock;
-        } else {
-            ctx.strokeStyle = Colors.defaultBlock;
-        }
-        b.destroyed = hitDetection(b, ball);
-        ctx.moveTo(b.x,b.y+b.h/2);
-        ctx.lineTo(b.x+b.w,b.y+b.h/2);
-        ctx.lineWidth = b.h;
-        ctx.stroke();
-    } else if (b.destroyed && b.fallable) {
-        b.y = b.y + 2;
-        ctx.strokeStyle = Colors.fallingBlock;
-        ctx.moveTo(b.x,b.y+b.h/2);
-        ctx.lineTo(b.x+b.w,b.y+b.h/2);
-        ctx.lineWidth = b.h;
-    }
-     //if (b.y >= canvas.height) {
-    if (hitDetectionBlockRacket(b,racket)) {
-        game.lives = game.lives - 1;
-        game.paused = true;
-        showBreakingNotification('FAIL<br>'+game.lives+' Lives left<br>Press Space to continue','FAIL');
-        initialBall();
-        initialRacket();
-        updateInfo();
-    }
-    ctx.stroke();
 }
 
 function hitDetectionBlockRacket(b, r) {
@@ -258,11 +280,9 @@ function hitDetection(block, ball) {
 
     if (helpDetection(cd,cz,dc,dz) || helpDetection(ab,az,ba,bz)) {
         ball.dy = -ball.dy;
-        game.blocks -= 1;
         return true;
     } else if (helpDetection(ac,az,ca,cz) || helpDetection(bd,bz,db,dz)) {
         ball.dx = -ball.dx;
-        game.blocks -= 1;
         return true;
     }
     return false;
@@ -286,7 +306,6 @@ function helpDetection(ab,az,ba,bz) {
 }
 
 function resizeCanvas() {
-    console.log("resizing Canvas");
     var fullWidth = window.innerWidth && document.documentElement.clientWidth ?
         Math.min(window.innerWidth, document.documentElement.clientWidth) :
         window.innerWidth ||
@@ -312,7 +331,6 @@ function showFPS() {
 }
 
 function updateInfo() {
-    //console.log(document.getElementById('lives'));
     document.getElementById('lives').innerHTML = game.lives;
     document.getElementById('level').innerHTML = game.level;
     document.getElementById('racketspeed').innerHTML = racket.speed;
@@ -346,16 +364,14 @@ function initializeGame(level) {
     updateInfo();
     ball.dx = game.speed;
     ball.dy = -game.speed;
-    game.blocks = block.columns * block.rows;
 }
 
 function draw() {
-    if (game.blocks === 0) {
+    if (countBlocks() === 0) {
         game.paused = true;
         initializeGame(game.level+1);
         showBreakingNotification('CONGRATS<br>You reached level '+game.level,'SUCCESS');
     }
-
     if (!game.paused) {
         var delta = (new Date().getTime() - lastRun)/1000;
         lastRun = new Date().getTime();
