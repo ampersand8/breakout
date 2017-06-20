@@ -33,7 +33,7 @@ function initialBall() {
     ball.dy = -game.speed;
 }
 
-function Block(x, y, destroyed = false, fallable = false, w = block.width, h = block.height) {
+var Block = function(x, y, destroyed = false, fallable = false, w = block.width, h = block.height) {
     this.id = Math.random().toString(16).slice(2);
     this.x = x;
     this.y = y;
@@ -53,9 +53,11 @@ function Block(x, y, destroyed = false, fallable = false, w = block.width, h = b
             this.color = '#222';
         }
         this.destroyed = true;
-        var index = blocks.map(x => x.id).indexOf(this.id);
-        if (index > -1) {
-            blocks.splice(index,1);
+        if (!this.fallable) {
+            var index = blocks.map(x => x.id).indexOf(this.id);
+            if (index > -1) {
+                blocks.splice(index, 1);
+            }
         }
     };
     this.draw = function() {
@@ -68,6 +70,12 @@ function Block(x, y, destroyed = false, fallable = false, w = block.width, h = b
             }
             if (this.destroyed && this.fallable) {
                 this.y = this.y + 2;
+                if (this.y > ctx.height) {
+                    var index = blocks.map(x => x.id).indexOf(this.id);
+                    if (index > -1) {
+                        blocks.splice(index, 1);
+                    }
+                }
             }
             ctx.strokeStyle = this.color;
             ctx.moveTo(this.x, this.y + this.h / 2);
@@ -84,7 +92,7 @@ function Block(x, y, destroyed = false, fallable = false, w = block.width, h = b
         }
         ctx.stroke();
     }
-}
+};
 
 // sets coords to initial values
 function initialRacket() {
@@ -278,11 +286,17 @@ function hitDetection(block, ball) {
     var cz = {x: ball.x - block.x, y: ball.y - (block.y + block.h)};
     var dz = {x: ball.x - (block.x + block.w), y: ball.y - (block.y + block.h)};
 
-    if (helpDetection(cd,cz,dc,dz) || helpDetection(ab,az,ba,bz)) {
-        ball.dy = -ball.dy;
+    if (helpDetection(cd,cz,dc,dz)) {
+        ball.dy = Math.abs(ball.dy);
+        return true
+    } else if (helpDetection(ab,az,ba,bz)) {
+        ball.dy = -Math.abs(ball.dy);
         return true;
-    } else if (helpDetection(ac,az,ca,cz) || helpDetection(bd,bz,db,dz)) {
-        ball.dx = -ball.dx;
+    } else if (helpDetection(ac,az,ca,cz)) {
+        ball.dx = -Math.abs(ball.dx);
+        return true;
+    } else if (helpDetection(bd,bz,db,dz)) {
+        ball.dx = Math.abs(ball.dx);
         return true;
     }
     return false;
