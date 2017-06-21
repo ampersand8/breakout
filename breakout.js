@@ -51,9 +51,6 @@ function Block(x, y, destroyed = false, fallable = false, w = block.width, h = b
         })()
     };
     function destroy() {
-        if (b.fallable) {
-            b.color = '#222';
-        }
         b.destroyed = true;
         if (!b.fallable) {
             var index = blocks.map(x => x.id).indexOf(b.id);
@@ -70,15 +67,7 @@ function Block(x, y, destroyed = false, fallable = false, w = block.width, h = b
             if (hitDetection(b, ball)) {
                 destroy();
             }
-            if (b.destroyed && b.fallable) {
-                b.y = b.y + 2;
-                if (b.y > ctx.height) {
-                    var index = blocks.map(x => x.id).indexOf(b.id);
-                    if (index > -1) {
-                        blocks.splice(index, 1);
-                    }
-                }
-            }
+            drop()
             ctx.strokeStyle = b.color;
             ctx.moveTo(b.x, b.y + b.h / 2);
             ctx.lineTo(b.x + b.w, b.y + b.h / 2);
@@ -93,6 +82,18 @@ function Block(x, y, destroyed = false, fallable = false, w = block.width, h = b
             updateInfo();
         }
         ctx.stroke();
+    };
+    function drop() {
+        if (b.destroyed && b.fallable) {
+            b.color = '#222';
+            b.y = b.y + 2;
+            if (b.y > ctx.height) {
+                var index = blocks.map(x => x.id).indexOf(b.id);
+                if (index > -1) {
+                    blocks.splice(index, 1);
+                }
+            }
+        }
     }
 
     return {
