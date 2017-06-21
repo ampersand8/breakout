@@ -33,56 +33,58 @@ function initialBall() {
     ball.dy = -game.speed;
 }
 
-var Block = function(x, y, destroyed = false, fallable = false, w = block.width, h = block.height) {
-    this.id = Math.random().toString(16).slice(2);
-    this.x = x;
-    this.y = y;
-    this.w = w;
-    this.h = h;
-    this.destroyed = destroyed;
-    this.fallable = fallable;
-    this.color = (function() {
-        if (this.fallable) {
-            return '#f33';
-        } else {
-            return '#0095dd';
+function Block(x, y, destroyed = false, fallable = false, w = block.width, h = block.height) {
+    var b = {
+        id: Math.random().toString(16).slice(2),
+        x: x,
+        y: y,
+        w: w,
+        h: h,
+        destroyed: destroyed,
+        fallable: fallable,
+        color: (function () {
+            if (fallable) {
+                return '#f33';
+            } else {
+                return '#0095dd';
+            }
+        })()
+    };
+    function destroy() {
+        if (b.fallable) {
+            b.color = '#222';
         }
-    })();
-    this.destroy = function() {
-        if (this.fallable) {
-            this.color = '#222';
-        }
-        this.destroyed = true;
-        if (!this.fallable) {
-            var index = blocks.map(x => x.id).indexOf(this.id);
+        b.destroyed = true;
+        if (!b.fallable) {
+            var index = blocks.map(x => x.id).indexOf(b.id);
             if (index > -1) {
                 blocks.splice(index, 1);
             }
         }
     };
-    this.draw = function() {
+    function draw() {
         ctx.beginPath();
-        if (this.destroyed && !this.fallable) {
+        if (b.destroyed && !b.fallable) {
 
         } else {
-            if (hitDetection(this, ball)) {
-                this.destroy();
+            if (hitDetection(b, ball)) {
+                destroy();
             }
-            if (this.destroyed && this.fallable) {
-                this.y = this.y + 2;
-                if (this.y > ctx.height) {
-                    var index = blocks.map(x => x.id).indexOf(this.id);
+            if (b.destroyed && b.fallable) {
+                b.y = b.y + 2;
+                if (b.y > ctx.height) {
+                    var index = blocks.map(x => x.id).indexOf(b.id);
                     if (index > -1) {
                         blocks.splice(index, 1);
                     }
                 }
             }
-            ctx.strokeStyle = this.color;
-            ctx.moveTo(this.x, this.y + this.h / 2);
-            ctx.lineTo(this.x + this.w, this.y + this.h / 2);
-            ctx.lineWidth = this.h;
+            ctx.strokeStyle = b.color;
+            ctx.moveTo(b.x, b.y + b.h / 2);
+            ctx.lineTo(b.x + b.w, b.y + b.h / 2);
+            ctx.lineWidth = b.h;
         }
-        if (hitDetectionBlockRacket(this,racket)) {
+        if (hitDetectionBlockRacket(b,racket)) {
             game.lives = game.lives - 1;
             game.paused = true;
             showBreakingNotification('FAIL<br>'+game.lives+' Lives left<br>Press Space to continue','FAIL');
@@ -91,6 +93,11 @@ var Block = function(x, y, destroyed = false, fallable = false, w = block.width,
             updateInfo();
         }
         ctx.stroke();
+    }
+
+    return {
+        draw: draw,
+        id: b.id
     }
 };
 
@@ -159,7 +166,7 @@ function createBlocks() {
             if (Math.random() >= 0.7) {
                 fallable = true;
             }
-            blocks.push(new Block( i * block.width + i * block.space + block.space,j * block.height + j * block.space,false,fallable));
+            blocks.push(Block( i * block.width + i * block.space + block.space,j * block.height + j * block.space,false,fallable));
         }
     }
 }
