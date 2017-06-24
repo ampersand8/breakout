@@ -7,8 +7,8 @@ var lastRun;
 var canvas = document.getElementById('breakoutCanvas');
 resizeCanvas();
 var ctx = canvas.getContext('2d');
-var game = {speed: 2, paused: false, level: 0, lives: 3};
-var levels = [{speed: 2},{speed: 3},{speed:  4},{speed: 5},{speed: 6}, {speed: 7}, {speed: 8}];
+var game = {speed: 2, fallable: 0.1, paused: false, level: 0, lives: 3};
+var levels = [{speed: 2, fallable:0.2},{speed: 3, fallable: 0.3 },{speed:  4, fallable: 0.4},{speed: 5, fallable: 0.5},{speed: 6, fallable: 0.6}, {speed: 7, fallable: 0.7 }, {speed: 8, fallable: 0.8}];
 var ball = {x: canvas.width / 2, y: canvas.height - 30, radius:10, color: "#0095DD", dx: 2, dy: -2};
 var block = { columns: 6, rows: 5,  space: 8 };
 block.width = (canvas.width - (block.columns * block.space + block.space)) / (block.columns);
@@ -164,7 +164,7 @@ function createBlocks() {
     for (var i = 0; i < block.columns; i++) {
         for (var j = 0; j < block.rows; j++) {
             fallable = false;
-            if (Math.random() >= 0.7) {
+            if (Math.random() >= 1 - levels[game.level].fallable) {
                 fallable = true;
             }
             blocks.push(Block( i * block.width + i * block.space + block.space,j * block.height + j * block.space,false,fallable));
