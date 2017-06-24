@@ -67,7 +67,7 @@ function Block(x, y, destroyed = false, fallable = false, w = block.width, h = b
             if (hitDetection(b, ball)) {
                 destroy();
             }
-            drop()
+            drop();
             ctx.strokeStyle = b.color;
             ctx.moveTo(b.x, b.y + b.h / 2);
             ctx.lineTo(b.x + b.w, b.y + b.h / 2);
@@ -392,7 +392,12 @@ function draw() {
     if (countBlocks() === 0) {
         game.paused = true;
         initializeGame(game.level+1);
-        showBreakingNotification('CONGRATS<br>You reached level '+game.level,'SUCCESS');
+        if (game.level >= 6) {
+            showBreakingNotification('CONGRATS<br>You won!','SUCCESS');
+            initializeGame(0);
+        } else {
+            showBreakingNotification('CONGRATS<br>You reached level ' + game.level, 'SUCCESS');
+        }
     }
     if (!game.paused) {
         var delta = (new Date().getTime() - lastRun)/1000;
